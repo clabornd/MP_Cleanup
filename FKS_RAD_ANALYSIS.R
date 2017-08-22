@@ -1,22 +1,4 @@
-library(ggplot2)
-library(ggmap)
-library(dplyr)
-library(lubridate)
-library(scales)
-library(geoR)
-library(spacetime)
-library(sp)
-library(zoo)
-library(readr)
-library(gstat)
-library(raster)
-library(purrr)
-library(gtools)
-library(reshape)
-library(nlme)
-library(lattice)
-
-#WOW CHANGES
+source("requirements.R")
 
 Rad.full <- read_csv("Rad_full_604.csv",col_types = cols(X1 = col_skip()))
 Rad.full <- Rad.full[-c(9222, 9530, 9571, 9652, 9693, 9734, 9775, 9817, 9859, 9901),] 

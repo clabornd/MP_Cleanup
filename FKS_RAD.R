@@ -1,17 +1,4 @@
-library(ggplot2)
-library(ggmap)
-library(dplyr)
-library(lubridate)
-library(scales)
-library(geoR)
-library(spacetime)
-library(sp)
-library(zoo)
-library(readr)
-library(gstat)
-library(raster)
-library(purrr)
-library(gtools)
+source(requirements)
 
 ############### THIS FILE IS ONLY TO BUILD THE DATA, VARIOUS CHUNKS CAN BE  ##################
 ############### RUN TO GET AN APPROPRIATE DATAFRAME TO USE IN KRIGING FILES ##################
@@ -29,7 +16,6 @@ time.origin <- 15044
 Rad <- Rad[year(Rad$`Captured Time`) <= 2017,]
 Rad <- Rad[is.na(Rad$`Captured Time`) == FALSE & is.na(Rad$Value)==FALSE,]
 Rad <- Rad[Rad$Longitude < 141.03,]
-
 
 #Set variables, define spatial resolution.
 Rad.rounded <-  Rad %>% mutate(Lat.dec = round(Rad$Latitude, 2),
@@ -61,32 +47,9 @@ inner.df <- as.data.frame(inner)
 inner.df <- inner.df %>% rename(Long.dec = coords.x1, Lat.dec = coords.x2)
 #various data storing
 
-save(inner, file = "SPDF_small_601.RData")
-write.csv(inner.df, "D:/Data/Rad_smallzone_601.csv")
-write.csv(Rad.rounded, "D:/Data/Rad_ymon_531.csv")
-write.csv(Rad.rounded, "D:/Data/Rad_rounded_coarse_529.csv")
-
-
-################ USE NLS TO GET RESIDUALS ####################
-
-estimate <- nls(data = Rad.clean, control = nls.control(maxiter = 1000),
-                log(Value+1) ~ z + 1/dist^a+time.int*b+Long.dec*c+Lat.dec*d, 
-                start = list(a = 2, b = 1, c = 1, d = 1, z =1))
-
-#log scale
-estimate <- nls(data = Rad.rounded, control = nls.control(maxiter = 1000),
-                log(Value+1) ~ z + 1/dist^a+time.int*b+Long.dec*c+Lat.dec*d, 
-                start = list(a = 2, b = 1, c = 1, d = 1, z = 1))
-
-summary(estimate)
-qplot(fitted(estimate), residuals(estimate))
-
-#Add Residuals to dataframe
-Rad.rounded["resids"] <- residuals(estimate)
-Rad.rounded["fitted"] <- fitted(estimate)
-Rad.rounded["time.ymon"] <- rep(as.Date("2011-01-01"), length(Rad.rounded$year))+
-  years(Rad.rounded$year)+
-  months(Rad.rounded$month-1)
+#write.csv(inner.df, "D:/Data/Rad_smallzone_601.csv")
+#write.csv(Rad.rounded, "D:/Data/Rad_ymon_531.csv")
+#write.csv(Rad.rounded, "D:/Data/Rad_rounded_coarse_529.csv")
 
 #Average by time and location, add POSITX dates
 Rad.clean <- Rad.rounded %>% 
